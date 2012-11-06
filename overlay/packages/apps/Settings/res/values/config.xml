@@ -20,4 +20,8 @@
 <!--
     <bool name="has_led_flash">true</bool>
 -->
+    <!-- Show extended desktop -->
+<!--
+    <bool name="config_show_expandedDesktop">true</bool>
+-->
 </resources>
