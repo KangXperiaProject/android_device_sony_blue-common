@@ -1,8 +1,5 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 
-# The gps config appropriate for this device
-$(call inherit-product, device/common/gps/gps_eu_supl.mk)
-
 COMMON_PATH := device/sony/blue-common
 
 DEVICE_PACKAGE_OVERLAYS += $(COMMON_PATH)/overlay
@@ -73,7 +70,7 @@ PRODUCT_COPY_FILES += \
 
 # GPS
 PRODUCT_COPY_FILES += \
-    $(COMMON_PATH)/prebuilt/gps.conf:system/etc/gps.conf
+    $(COMMON_PATH)/config/gps.conf:system/etc/gps.conf
 
 # EGL config
 PRODUCT_COPY_FILES += \
@@ -90,6 +87,10 @@ PRODUCT_PACKAGES += \
     Nfc \
     Tag \
     com.android.nfc_extras
+
+# Recovery
+PRODUCT_PACKAGES += \
+    extract_elf_ramdisk
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml
