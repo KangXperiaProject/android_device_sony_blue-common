@@ -32,27 +32,30 @@
 
 #include <hardware/lights.h>
 
-char const*const LCD_BACKLIGHT_FILE	= "/sys/class/leds/lcd-backlight_1/brightness";
-char const*const LCD_BACKLIGHT2_FILE	= "/sys/class/leds/lcd-backlight_2/brightness";
-char const*const RED_LED_FILE		= "/sys/class/leds/pwr-red/brightness";
-char const*const GREEN_LED_FILE		= "/sys/class/leds/pwr-green/brightness";
-char const*const BLUE_LED_FILE		= "/sys/class/leds/pwr-blue/brightness";
+char const*const LCD_BACKLIGHT_FILE	   = "/sys/class/leds/lcd-backlight_1/brightness";
+char const*const LCD_BACKLIGHT2_FILE   = "/sys/class/leds/lcd-backlight_2/brightness";
+char const*const RED_LED_FILE		   = "/sys/class/leds/pwr-red/brightness";
+char const*const GREEN_LED_FILE		   = "/sys/class/leds/pwr-green/brightness";
+char const*const BLUE_LED_FILE		   = "/sys/class/leds/pwr-blue/brightness";
 
-char const*const ALS_FILE		= "/sys/devices/i2c-10/10-0040/als_on";
-char const*const LED_FILE_TRIGGER[]	= {
-					  "/sys/class/leds/pwr-red/use_pattern",
-					  "/sys/class/leds/pwr-green/use_pattern",
-					  "/sys/class/leds/pwr-blue/use_pattern",
+char const*const ALS_FILE		       = "/sys/devices/i2c-10/10-0040/als_on";
+
+char const*const LED_FILE_TRIGGER[] = {
+        "/sys/class/leds/pwr-red/use_pattern",
+        "/sys/class/leds/pwr-green/use_pattern",
+        "/sys/class/leds/pwr-blue/use_pattern",
 };
 
-char const*const LED_FILE_PATTERN	= "/sys/devices/i2c-10/10-0040/pattern_data";
-char const*const LED_FILE_REPEATDELAY	= "/sys/devices/i2c-10/10-0040/pattern_delay";
-char const*const LED_FILE_PATTERNLEN	= "/sys/devices/i2c-10/10-0040/pattern_duration_secs";
-char const*const LED_FILE_DIMONOFF	= "/sys/devices/i2c-10/10-0040/pattern_use_softdim";
-char const*const LED_FILE_DIMTIME	= "/sys/devices/i2c-10/10-0040/dim_time";
+char const*const LED_FILE_PATTERN      = "/sys/devices/i2c-10/10-0040/pattern_data";
+char const*const LED_FILE_REPEATDELAY  = "/sys/devices/i2c-10/10-0040/pattern_delay";
+char const*const LED_FILE_PATTERNLEN   = "/sys/devices/i2c-10/10-0040/pattern_duration_secs";
+char const*const LED_FILE_DIMONOFF     = "/sys/devices/i2c-10/10-0040/pattern_use_softdim";
+char const*const LED_FILE_DIMTIME      = "/sys/devices/i2c-10/10-0040/dim_time";
 
-char const*const ON	= "1";
-char const*const OFF	= "0";
+const int LCD_BRIGHTNESS_MIN = 10;
+
+char const*const ON = "1";
+char const*const OFF = "0";
 
 /* Synchronization primities */
 static pthread_once_t g_init = PTHREAD_ONCE_INIT;
@@ -131,8 +134,8 @@ static int brightness_apply_gamma (int brightness) {
 	ALOGV("%s: gamma corrected floatbrt = %f", __func__, floatbrt);
 	floatbrt *= 255.0;
 	brightness = (int) floatbrt;
-	if(brightness < 1)
-		brightness = 1;
+	if (brightness < LCD_BRIGHTNESS_MIN)
+		brightness = LCD_BRIGHTNESS_MIN;
 	ALOGV("%s: gamma corrected brightness = %d", __func__, brightness);
 	return brightness;
 }
@@ -149,7 +152,7 @@ static int set_light_backlight (struct light_device_t *dev, struct light_state_t
 	if ((state->brightnessMode == BRIGHTNESS_MODE_SENSOR) && (brightness > 0))
 		enable = 1;
 
-	ALOGV("%s brightness = %d", __func__, brightness);
+	ALOGD("%s brightness = %d", __func__, brightness);
 	pthread_mutex_lock(&g_lock);
 	err = write_int (ALS_FILE, enable);
 	err |= write_int (LCD_BACKLIGHT_FILE, brightness);
